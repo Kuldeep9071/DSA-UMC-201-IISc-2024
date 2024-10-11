@@ -65,7 +65,7 @@ int Max_Subarray_Sum_Divide_and_Conquer(vector<int> &arr, int l, int r) {
 
 /*
 Time Complexity: O(n)
-Space Complexity: O(n)
+Space Complexity: O(1)
 */
 
 vector<int> Max_Subarray_Sum_Divide_and_Conquer_Modified_Helper(vector<int> &arr, int l, int r) {
