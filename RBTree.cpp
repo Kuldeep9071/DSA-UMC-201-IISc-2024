@@ -122,36 +122,38 @@ RBTreeNode* insert(RBTreeNode* root,int val){
 // Deletion in Red Black Tree
 
 void Delete(RBTreeNode* root,int val){
-	if(!root){
-		cout<<"ERROR: Deletion Not Possible as Tree is Empty!\n";
-		return;
-	}
-	RBTreeNode* node=root;
-	while(node && node->val!=val){
-		if(node->val > val) node=node->left;
-		else node=node->right;
-	}
+	RBTreeNode* node=search(root,val);
 	if(!node){
-		cout<<"ERROR: Deletion Not Possible as Node with value "<<val<<" is not present in the Tree!\n";
+		cout<<"ERROR: Node with value "<<val<<" Not Found in the Tree!\n";
 		return;
 	}
 	if(!node->left && !node->right){
-		RBTreeNode* Father=node->parent;
-		if(Father){
-			if(Father->left==node) Father->left=nullptr;
-			else Father->right=nullptr;
+		if(node->parent){
+			if(node->parent->left==node) node->parent->left=nullptr;
+			else node->parent->right=nullptr;
 		}
 		delete node;
+		return;
 	}
-	else if(node->left && !node->right){
-		RBTreeNode* Father=node->parent;
-		if(Father){
-			if(Father->left==node) Father->left=node->left;
-			else Father->right=node->left;
-		}
-		node->left->parent=Father;
-		delete node;
+	if(node->left && node->right){
+		RBTreeNode* temp=node->right;
+		while(temp->left) temp=temp->left;
+		node->val=temp->val;
+		Delete(node->right,temp->val);
+		return;
 	}
+	RBTreeNode* child=node->left;
+	if(!child) child=node->right;
+	if(node->parent){
+		if(node->parent->left==node) node->parent->left=child;
+		else node->parent->right=child;
+	}
+	child->parent=node->parent;
+	if(node->color=='B'){
+		if(child->color=='R') child->color='B';
+		else Fix(child);
+	}
+	delete node;
 }
 
 // Printing the Red Black Tree in Inorder Traversal (Sorted Order)
@@ -186,15 +188,20 @@ int main(){
 	root=insert(root,20);
 	root=insert(root,30);
 	root=insert(root,15);
-	root=insert(root,25);
-	root=insert(root,35);
-	root=insert(root,40);
-	root=insert(root,0);
-	root=insert(root,5);
-	root=insert(root,3);
+	// root=insert(root,25);
+	// root=insert(root,35);
+	// root=insert(root,40);
+	// root=insert(root,0);
+	// root=insert(root,5);
+	// root=insert(root,3);
 	cout<<"Height of Tree: "<<Height(root)<<"\n";
 	cout<<"Black Height of Tree: "<<BlackHeight(root)<<"\n";
 	printRBTree(root);
+	Delete(root,10);
+	cout<<"Height of Tree: "<<Height(root)<<"\n";
+	cout<<"Black Height of Tree: "<<BlackHeight(root)<<"\n";
+	printRBTree(root);
+	cout<<root->val<<"("<<root->color<<")\n";
 	cout<<"\n";
 	return 0;
 }
