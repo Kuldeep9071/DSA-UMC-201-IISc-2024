@@ -67,34 +67,29 @@ int Divide_Conquer_Count2(vector<int> &arr,int l,int r) {
 
 // O(nlog(n)) Approach
 
-int Divide_Conquer_Count3(vector<int> &arr,int l,int r) {
-    int Count=0;
-    if(l<r) {
-        int m=l+(r-l)/2;
-        Count+=Divide_Conquer_Count2(arr,l,m);
-        Count+=Divide_Conquer_Count2(arr,m+1,r);
-        vector<int> temp;
-        int i=l,j=m+1;
-        while(i<=m && j<=r) {
-            if(arr[i] <= arr[j]){
-                temp.push_back(arr[i]);
-                i++;
-            } 
-            else {
-                temp.push_back(arr[j]);
-                j++;
-                Count += m-i+1;
-            }
-        }
-        while(i<=m) {
-            temp.push_back(arr[i]);
+pair<int,vector<int>> inversions(vector<int> arr,int l,int r){
+    if(l==r) return {0,{arr[l]}};
+    int m=l+(r-l)/2;
+    pair<int,vector<int>> L=inversions(arr,l,m);
+    pair<int,vector<int>> R=inversions(arr,m+1,r);
+    vector<int> ans;
+    int cnt=L.first+R.first,i=0,j=0,p=L.second.size(),q=R.second.size();
+    while(i<p && j<q){
+        if(L.second[i]<=R.second[j]){
+            ans.push_back(L.second[i]);
             i++;
         }
-        while(j<=r) {
-            temp.push_back(arr[j]);
+        else{
+            ans.push_back(R.second[j]);
             j++;
+            cnt+=p-i;
         }
-        for(int i=l;i<=r;i++) arr[i]=temp[i-l];
     }
-    return Count;
+    while(i<p) ans.push_back(L.second[i++]);
+    while(j<q) ans.push_back(R.second[j++]);
+    return {cnt,ans};
+}
+
+int Divide_Conquer_Count3(vector<int> arr){
+    return inversions(arr,0,arr.size()-1).first;
 }
